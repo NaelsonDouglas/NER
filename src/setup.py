@@ -14,7 +14,8 @@ setup(
         'spacy',
         'fastparquet',
         'pyarrow',
-        'rich'
+        'rich',
+        'tqdm'
     ],
     scripts=[],
 )

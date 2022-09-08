@@ -103,7 +103,9 @@ srsly==2.4.4
 thinc==8.1.0
     # via spacy
 tqdm==4.64.1
-    # via spacy
+    # via
+    #   ner (setup.py)
+    #   spacy
 typer==0.4.2
     # via
     #   pathy

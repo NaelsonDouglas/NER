@@ -19,11 +19,16 @@ class _DevWarner:
     def __init__(self):
         self.already_started = True
         if configs.is_dev:
-            log.warning('The application is being executed in DEVELOPMENT mode.')
+            mode = 'DEVELOPMENT'
+        else:
+            mode = 'PRODUCTION'
+        log.warning(f'The application is being executed in {mode} mode.')
 
-
-logging.basicConfig(level=configs.LOG_LEVEL, format='%(message)s', datefmt='[%X]', handlers=[RichHandler()])
+_WARNING_LEVEL=20
+logging.basicConfig(level=_WARNING_LEVEL, format='%(message)s', datefmt='[%X]', handlers=[RichHandler()])
 log = logging.getLogger('rich')
-log.setLevel(configs.LOG_LEVEL)
 
+log.setLevel(_WARNING_LEVEL)
 _DevWarner()
+
+log.setLevel(configs.LOG_LEVEL)
