@@ -16,7 +16,10 @@ setup(
         'pyarrow',
         'rich',
         'tqdm',
-        'torch'
+        'torch',
+        'sklearn',
+        'cupy-cuda11x',
+        'spacy-transformers'
     ],
     scripts=[],
 )

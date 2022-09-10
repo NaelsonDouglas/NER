@@ -3,6 +3,7 @@ from spacy.matcher import Matcher
 import spacy
 import json
 
+from sklearn.model_selection import train_test_split
 from configs import configs
 from constants import MAKE, TITLE, MODELNAME
 from spacy_singleton import nlp
@@ -22,9 +23,11 @@ class TagMaker:
                 if all_ners:
                     train_cell = [title, {'entities': all_ners}]
                     data.append(train_cell)
-        with open('train.json', 'w') as f:
-            f.write(json.dumps(data))
-        return data
+        train, test = train_test_split(data)
+        with open('train.json', 'w') as train_io, open('test.json', 'w') as test_io:
+            train_io.write(json.dumps(train))
+            test_io.write(json.dumps(test))
+        return train, test
 
 
     def _build_generic_taglist(self, title, ner, ner_tag) -> list:
