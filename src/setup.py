@@ -19,7 +19,8 @@ setup(
         'torch',
         'sklearn',
         'cupy-cuda11x',
-        'spacy-transformers'
+        'spacy-transformers',
+        'thefuzz'
     ],
     scripts=[],
 )

@@ -140,6 +140,8 @@ srsly==2.4.4
     #   spacy
     #   spacy-transformers
     #   thinc
+thefuzz==0.19.0
+    # via ner (setup.py)
 thinc==8.1.0
     # via spacy
 threadpoolctl==3.1.0
