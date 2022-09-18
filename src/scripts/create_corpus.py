@@ -20,12 +20,12 @@ class TagMaker:
         data = []
         for _, row in tqdm(list(df.iterrows())):
             title = row[TITLE].strip()
-            title = re.sub(r'-|\n|\t', ' ', title)
+            title = re.sub(r'\n|\t', ' ', title)
             title = re.sub(r'\s{2,}', ' ', title)
             if title:
                 all_ners = []
                 for tag in ner_tags:
-                    _ners = self._build_generic_taglist(title, row[tag], tag.upper())
+                    _ners = self._build_generic_taglist(title, str(row[tag]), str(tag).upper())
                     all_ners = all_ners + _ners
                 if all_ners:
                     # train_cell = [title, {'entities': all_ners}]
@@ -61,11 +61,20 @@ class TagMaker:
             doc = nlp(text)
             spans_list = list()
             for (start, end, tag) in spans:
-                span = doc.char_span(start, end, label=tag)
+                try:
+                    span = doc.char_span(start, end, label=tag)
+                except IndexError:
+                    span = None
                 if span:
                     spans_list.append(span)
-                    doc.set_ents(spans_list)
-                    doc.spans['sc'] = list(doc.ents)
+                    # try:
+                    #     doc.set_ents(spans_list) # There is no need to set entities, since we are no longer using the NER approach
+                    # except:
+                    #     breakpoint()
+                    # doc.spans['sc'] = list(doc.ents)
+                    doc.spans['sc'] = list(spans_list)
+                    if len(spans_list)>1:
+                        breakpoint()
                     doc_bin.add(doc)
         doc_bin.to_disk(f'corpus/{output_basename}.spacy')
         return doc_bin
@@ -77,6 +86,7 @@ class TagMaker:
         doc = nlp(title)
         matches = matcher(doc)
         ners = []
+        # [(5355920296067362042, 3, 4)]
         if matches:
             ners = list()
             for _, start, end in matches:
@@ -95,11 +105,14 @@ class TagMaker:
 
 
 if __name__ == '__main__':
+    dataset = 'ds_13k.csv'
+    dataset = 'big_dataset.csv'
+    dataset = 'temp.csv'
     try:
-        df = pd.read_csv('assets/ds_13k.csv',on_bad_lines='warn')
+        df = pd.read_csv(f'assets/{dataset}',on_bad_lines='warn')
     except FileNotFoundError:
-        df = pd.read_csv('ds_13k.csv',on_bad_lines='warn')
-    df = df[KEEP_COLUMNS].dropna().sample(200)
+        df = pd.read_csv(f'{dataset}',on_bad_lines='warn')
+    df = df[KEEP_COLUMNS].dropna().sample(100)
     tag_maker = TagMaker()
     train, test, val = tag_maker.build_tags(df, FEATURES)
     # train = list(train.get_docs(nlp.vocab))
