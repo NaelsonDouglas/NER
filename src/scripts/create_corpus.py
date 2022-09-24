@@ -12,7 +12,7 @@ from tqdm import tqdm
 
 from configs import configs
 from logger import log
-from constants import FEATURES, KEEP_COLUMNS, TITLE
+from constants import FEATURES, KEEP_COLUMNS, TITLE, MODELNOQ
 
 nlp = spacy.load('en_core_web_sm')
 
@@ -77,7 +77,8 @@ class TagMaker:
                 if span:
                     spans_list.append(span)
                     doc.spans['sc'] = list(spans_list)
-                    doc_bin.add(doc)
+            if spans_list:
+                doc_bin.add(doc)
         doc_bin.to_disk(f'corpus/{output_basename}.spacy')
         return doc_bin
 
@@ -137,6 +138,7 @@ if __name__ == '__main__':
     # df = df[KEEP_COLUMNS].dropna()
     df = df.query('~title.isnull()')
     df = df.fillna('')
+    df = df.groupby([TITLE,MODELNOQ]).first().reset_index(drop=False)
     tag_maker = TagMaker()
     train, test, val = tag_maker.build_tags(df, FEATURES)
     # train = list(train.get_docs(nlp.vocab))
