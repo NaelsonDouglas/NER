@@ -16,6 +16,7 @@ def apply(sample:pd.DataFrame, model, lowercase:bool=False) -> None:
 
 if __name__ == '__main__':
     dataset = 'final_dataset.csv'
+    model = spacy.load('training/model-best')
     df = pd.read_csv(f'assets/{dataset}',on_bad_lines='warn')[KEEP_COLUMNS]
     df = df.query('~title.isnull()')
     df = df.fillna('')

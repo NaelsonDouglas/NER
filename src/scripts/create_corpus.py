@@ -2,6 +2,7 @@ import json
 import random
 import re
 from itertools import product
+import math
 
 import pandas as pd
 import spacy
@@ -9,6 +10,7 @@ from sklearn.model_selection import train_test_split
 from spacy.matcher import Matcher
 from spacy.tokens import DocBin
 from tqdm import tqdm
+import regex
 
 from configs import configs
 from logger import log
@@ -22,18 +24,17 @@ class TagMaker:
         data = []
         for _, row in tqdm(list(df.iterrows())):
             title = row[TITLE].strip()
-            title = re.sub(r'\n|\t', ' ', title)
-            title = re.sub(r'\s{2,}', ' ', title)
+            title = re.sub(r'\n|\t|\s{2,}', ' ', title)
             if title:
                 all_ners = []
                 for tag in ner_tags:
                     entity = row[tag]
                     if entity:
-                        _ners = self._build_generic_taglist(title, entity, str(tag).upper())
-                        all_ners = all_ners + _ners
+                        _tag_ner = self._build_generic_taglist(title, entity, str(tag).upper())
+                        all_ners = all_ners + [_tag_ner]
                 if all_ners:
                     # train_cell = [title, {'entities': all_ners}]
-                    all_ners = [tuple(ner) for ner in all_ners]
+                    all_ners = [tuple(ner) for ner in all_ners if ner]
                     train_cell = [title, all_ners]
                     data.append(train_cell)
         log.info('Spliting train and test_eval')
@@ -82,48 +83,55 @@ class TagMaker:
         doc_bin.to_disk(f'corpus/{output_basename}.spacy')
         return doc_bin
 
+    def find_match(self, ner:str, title:str):
+        match = self._find_fuzzy_match(ner, title)
+        return match
+
     def _build_generic_taglist(self, title, ner, ner_tag) -> list:
         ners = []
-        matches = self._find_matches(ner,title)
-        if matches:
-            matches = [m.span() for m in matches]
-            ners = list()
-            for start, end in matches:
-                ner = [start, end, ner_tag]
-                ners.append(ner)
+        match = self.find_match(ner,title)
+        if match:
+            start, end = match.span()
+            ners = [start, end, ner_tag]
         return ners
 
     def _clear_empty_titles(self, df:pd.DataFrame) -> pd.DataFrame:
         return df[~df[TITLE].isna()]
 
-    def _find_matches(self, ner:str, title:str):
-        """
-        Takes a ner text, like  PA-28-180, creates many variations with it replacing special characters (e.g. PA28180, PA.28.180)
-        Then it finds if any of its variations are present on the title.
-        """
-        ner = re.escape(ner.lower())
-        _ner = ner
-        ner.replace(' ','\s')
-        title = title.lower()
-        replaces = [' ', '-', '/', '.']
-        replaces = product(replaces, replaces)
-        replaces = [r for r in replaces if r[0]!=r[1]]
-        patterns = []
-        for (original, replacement) in replaces:
-            _ner = re.escape(ner.replace(original, replacement))
-            patterns.append(_ner)
-            _ner = re.escape(ner.replace(original, ''))
-            patterns.append(_ner)
-        patterns.append(ner)
-        patterns = set(patterns)
-        patterns = '|'.join(patterns)
-        try:
-            matches = re.finditer(re.compile(patterns), title)
-        except:
-            breakpoint()
-        if not matches:
-            breakpoint()
-        return matches
+    # def _find_match(self, ner:str, title:str):
+    #     """
+    #     Takes a ner text, like  PA-28-180, creates many variations with it replacing special characters (e.g. PA28180, PA.28.180)
+    #     Then it finds if any of its variations are present on the title.
+    #     """
+    #     _ner = re.escape(ner.lower().replace(' ','\s'))
+    #     title = title.lower()
+    #     replaces = [' ', '-', '/', '.']
+    #     replaces = product(replaces, replaces)
+    #     replaces = [r for r in replaces if r[0]!=r[1]]
+    #     patterns = []
+    #     for (original, replacement) in replaces:
+    #         _ner = re.escape(_ner.replace(original, replacement))
+    #         patterns.append(_ner)
+    #         _ner = re.escape(_ner.replace(original, ''))
+    #         patterns.append(_ner)
+    #     patterns.append(_ner)
+    #     patterns = set(patterns)
+    #     patterns = '|'.join(patterns)
+    #     match = re.search(re.compile(patterns), title)
+    #     return match
+
+    def _find_fuzzy_match(self, ner:str, title:str) -> regex.Match:
+        BEST_MATCH_FLAG = '(?b)'
+        max_errors = math.floor(len(ner)/2)
+        constraints = '{'+f'i<=1,d<={max_errors},s<=1,e<={max_errors}'+'}' #Max of 8 deletions and 3 substitutions (?b) filters to the best match
+        pattern = f'({ner.lower()}){constraints}{BEST_MATCH_FLAG}'
+        match = regex.search(pattern, title.lower())
+        if not match:
+            print()
+            print(title)
+            print(ner)
+            print()
+        return match
 
 
 
