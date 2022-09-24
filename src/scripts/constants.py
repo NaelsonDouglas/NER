@@ -2,8 +2,8 @@ KEEP_COLUMNS = [
     TITLE := 'title',
     MAKE := 'make',
     MODELNAME := 'modelname',
+    MODELNAMEQ := 'modelnameq',
     MODELNO := 'modelno',
     MODELNOQ := 'modelnoq',
 ]
-FEATURES = [MAKE, MODELNAME, MODELNO, MODELNOQ]
-FEATURES = [MODELNAME, MODELNO, MODELNOQ]
+FEATURES = [MAKE, MODELNAME,MODELNAMEQ, MODELNO, MODELNOQ]
