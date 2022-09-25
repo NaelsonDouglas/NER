@@ -1,0 +1,12 @@
+{
+  "labels":[
+    "MAKE",
+    "MODELNAME",
+    "MODELNO",
+    "MODELNOQ",
+    "MODELNAMEQ"
+  ],
+  "spans_key":"sc",
+  "threshold":0.5,
+  "max_positive":null
+}

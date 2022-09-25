@@ -21,6 +21,7 @@ setup(
         'cupy-cuda11x',
         'spacy-transformers',
         'thefuzz',
+        'uvicorn',
         'fastapi'
     ],
     scripts=[],
