@@ -15,6 +15,7 @@ import regex
 from configs import configs
 from logger import log
 from constants import FEATURES, KEEP_COLUMNS, TITLE, MODELNOQ
+from preprocessor import preprocess
 
 nlp = spacy.load('en_core_web_sm')
 
@@ -23,8 +24,8 @@ class TagMaker:
         patterns = dict()
         data = []
         for _, row in tqdm(list(df.iterrows())):
-            title = row[TITLE].strip()
-            title = re.sub(r'\n|\t|\s{2,}', ' ', title)
+            title = row[TITLE]
+            title = preprocess(title)
             if title:
                 all_ners = []
                 for tag in ner_tags:
@@ -38,9 +39,11 @@ class TagMaker:
                     train_cell = [title, all_ners]
                     data.append(train_cell)
         log.info('Spliting train and test_eval')
-        train, test_eval = train_test_split(data, test_size = 0.8)
+        # Tiny test dataset, small evaluation dataset and huge test dataset
+        train, test_eval = train_test_split(data, test_size = 0.9)
         log.info('Spliting test and dev')
-        test, dev = train_test_split(data, test_size = 0.5)
+        dev, test = train_test_split(data, test_size = 0.95)
+        train, test = train_test_split(data, test_size = 0.3)
         log.info('Persisting')
         train, test, dev = self.persist(train, test, dev)
         return train, test, dev
@@ -126,11 +129,11 @@ class TagMaker:
         constraints = '{'+f'i<=1,d<={max_errors},s<=1,e<={max_errors}'+'}' #Max of 8 deletions and 3 substitutions (?b) filters to the best match
         pattern = f'({ner.lower()}){constraints}{BEST_MATCH_FLAG}'
         match = regex.search(pattern, title.lower())
-        if not match:
-            print()
-            print(title)
-            print(ner)
-            print()
+        # if not match:
+        #     print()
+        #     print(title)
+        #     print(ner)
+        #     print()
         return match
 
 
@@ -144,7 +147,7 @@ if __name__ == '__main__':
     except FileNotFoundError:
         df = pd.read_csv(f'../assets/{dataset}',on_bad_lines='warn')
     # df = df[KEEP_COLUMNS].dropna()
-    df = df.query('~title.isnull()')
+    df = df.query('~title.isnull()').sample(1200)
     df = df.fillna('')
     df = df.groupby([TITLE,MODELNOQ]).first().reset_index(drop=False)
     tag_maker = TagMaker()

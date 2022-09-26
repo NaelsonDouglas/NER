@@ -22,7 +22,8 @@ setup(
         'spacy-transformers',
         'thefuzz',
         'uvicorn',
-        'fastapi'
+        'fastapi',
+        'nltk'
     ],
     scripts=[],
 )

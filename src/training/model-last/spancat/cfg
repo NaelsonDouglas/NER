@@ -1,9 +1,9 @@
 {
   "labels":[
-    "MAKE",
     "MODELNAME",
-    "MODELNO",
     "MODELNOQ",
+    "MAKE",
+    "MODELNO",
     "MODELNAMEQ"
   ],
   "spans_key":"sc",

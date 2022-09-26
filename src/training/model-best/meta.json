@@ -21,10 +21,10 @@
 
     ],
     "spancat":[
-      "MAKE",
       "MODELNAME",
-      "MODELNO",
       "MODELNOQ",
+      "MAKE",
+      "MODELNO",
       "MODELNAMEQ"
     ]
   },
@@ -40,10 +40,10 @@
 
   ],
   "performance":{
-    "spans_sc_f":0.9427860039,
-    "spans_sc_p":0.9591790635,
-    "spans_sc_r":0.9269438669,
-    "tok2vec_loss":16.7169396833,
-    "spancat_loss":3425.3276920319
+    "spans_sc_f":0.9565217391,
+    "spans_sc_p":0.9649122807,
+    "spans_sc_r":0.9482758621,
+    "tok2vec_loss":0.0266829488,
+    "spancat_loss":1.8359005757
   }
 }
