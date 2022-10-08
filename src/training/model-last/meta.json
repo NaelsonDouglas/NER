@@ -40,10 +40,10 @@
 
   ],
   "performance":{
-    "spans_sc_f":0.9527896996,
-    "spans_sc_p":0.9487179487,
-    "spans_sc_r":0.9568965517,
-    "tok2vec_loss":0.0125536011,
-    "spancat_loss":0.4760011395
+    "spans_sc_f":0.947826087,
+    "spans_sc_p":0.9561403509,
+    "spans_sc_r":0.9396551724,
+    "tok2vec_loss":0.0209495409,
+    "spancat_loss":4.049820772
   }
 }
