@@ -1,1 +1,0 @@
-python -m spacy train config.cfg --gpu-id 0 --output ./output --paths.train ./train.spacy --paths.dev ./test.spacy

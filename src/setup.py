@@ -20,7 +20,10 @@ setup(
         'sklearn',
         'cupy-cuda11x',
         'spacy-transformers',
-        'thefuzz'
+        'thefuzz',
+        'uvicorn',
+        'fastapi',
+        'nltk'
     ],
     scripts=[],
 )
