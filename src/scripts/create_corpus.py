@@ -147,7 +147,7 @@ if __name__ == '__main__':
     except FileNotFoundError:
         df = pd.read_csv(f'../assets/{dataset}',on_bad_lines='warn')
     # df = df[KEEP_COLUMNS].dropna()
-    df = df.query('~title.isnull()').sample(1200)
+    df = df.query('~title.isnull()')
     df = df.fillna('')
     df = df.groupby([TITLE,MODELNOQ]).first().reset_index(drop=False)
     tag_maker = TagMaker()
